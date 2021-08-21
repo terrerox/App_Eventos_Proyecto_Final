@@ -21,3 +21,7 @@ VALUES
 
 SELECT *
 FROM EVENTOS;
+
+truncate table Eventos;
+
+show databases;
