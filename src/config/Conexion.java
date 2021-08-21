@@ -33,7 +33,7 @@ public class Conexion {
         
         try {
             con = DriverManager.getConnection(url, username, password);
-            System.out.println("lProbado aqui!");
+            System.out.println("Probado aqui!!");
         } catch (Exception e) {
             e.printStackTrace();
         }
