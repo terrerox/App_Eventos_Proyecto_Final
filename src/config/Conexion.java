@@ -142,7 +142,7 @@ public class Conexion {
  
          // List<Evento> eventos = new ArrayList<>();
         
-        String query = "SELECT * FROM EVENTOS WHERE LUGAR = " + "\"" + lugar + "\"";
+        String query = "SELECT * FROM EVENTOS WHERE LUGAR = " + "\"" + lugar + "\" ORDER BY FECHA";
         conectar();
         
         try {
@@ -168,7 +168,7 @@ public class Conexion {
 
         // List<Evento> eventos = new ArrayList<>();
         
-       String query = "SELECT * FROM EVENTOS WHERE DETALLES LIKE " + "\"%" + expresion + "%\"";
+       String query = "SELECT * FROM EVENTOS WHERE DETALLES LIKE " + "\"%" + expresion + "%\" ORDER BY FECHA";
        conectar();
        
          try {
@@ -215,7 +215,7 @@ public class Conexion {
         
         // List<Evento> eventos = new ArrayList<>();
         
-        String query = "SELECT * FROM EVENTOS";
+        String query = "SELECT * FROM EVENTOS ORDER BY FECHA";
         conectar();
         
         try {
@@ -263,9 +263,11 @@ public class Conexion {
     }
        
     
-    public static void main(String[] args){
+    /*public static void main(String[] args){
        
         Conexion co = new Conexion();
-        co.actualizarEvento(2);
+        co.buscarEventoPor("ITLA");
     }   
+
+*/
 }
