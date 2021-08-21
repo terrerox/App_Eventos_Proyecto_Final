@@ -21,3 +21,25 @@ VALUES
 
 SELECT *
 FROM EVENTOS;
+
+/**-----FILTROS ESPECIALES-----**/
+
+SELECT * 
+FROM eventos
+order by FECHA DESC;
+
+SELECT * 
+FROM eventos
+order by HORA_INICIO DESC;
+
+SELECT * 
+FROM eventos
+order by HORA_FINAL DESC;
+
+SELECT * 
+FROM eventos
+WHERE DETALLES LIKE '%TE%'; /*PARCEO DESDE LA APP*/
+
+SELECT * 
+FROM eventos
+WHERE NOMBRE LIKE '%mat%'; /*PARCEO DESDE LA APP*/
