@@ -1,17 +1,47 @@
 package model;
 
-import java.time.LocalDate;
+import java.sql.Date;
+import java.sql.Time;
 
 public class Evento {
-    
-    public Evento(){}
-    
+
+    private int idEvento;
     private String nombreEvento;
-    private int horaInicio;
-    private int horaFinal;
+    private Time horaInicio;
+    private Time horaFinal;
     private String lugar;
-    private LocalDate fecha;
+    private Date fecha;
     private String detalles;
+
+    public Evento() {
+    }
+
+    public Evento(String nombreEvento, Time horaInicio, Time horaFinal, String lugar, Date fecha, String detalles) {
+
+        this.nombreEvento = nombreEvento;
+        this.horaInicio = horaInicio;
+        this.horaFinal = horaFinal;
+        this.lugar = lugar;
+        this.fecha = fecha;
+        this.detalles = detalles;
+
+    }
+
+    public Evento(int idEvento, String nombreEvento, Time horaInicio, Time horaFinal, String lugar, Date fecha,
+            String detalles) {
+
+        this.idEvento = idEvento;
+        this.nombreEvento = nombreEvento;
+        this.horaInicio = horaInicio;
+        this.horaFinal = horaFinal;
+        this.lugar = lugar;
+        this.fecha = fecha;
+        this.detalles = detalles;
+    }
+
+    public int getId() {
+        return idEvento;
+    }
 
     public String getNombreEvento() {
         return nombreEvento;
@@ -21,19 +51,19 @@ public class Evento {
         this.nombreEvento = nombreEvento;
     }
 
-    public int getHoraInicio() {
+    public Time getHoraInicio() {
         return horaInicio;
     }
 
-    public void setHoraInicio(int horaInicio) {
+    public void setHoraInicio(Time horaInicio) {
         this.horaInicio = horaInicio;
     }
 
-    public int getHoraFinal() {
+    public Time getHoraFinal() {
         return horaFinal;
     }
 
-    public void setHoraFinal(int horaFinal) {
+    public void setHoraFinal(Time horaFinal) {
         this.horaFinal = horaFinal;
     }
 
@@ -45,11 +75,11 @@ public class Evento {
         this.lugar = lugar;
     }
 
-    public LocalDate getFecha() {
+    public Date getFecha() {
         return fecha;
     }
 
-    public void setFecha(LocalDate fecha) {
+    public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
 
@@ -60,8 +90,4 @@ public class Evento {
     public void setDetalles(String detalles) {
         this.detalles = detalles;
     }
-    
-    
-    
-    
 }
