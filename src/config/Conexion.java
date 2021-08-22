@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.List;
+import model.Evento;
 
 /**
  *
@@ -23,251 +25,242 @@ public class Conexion {
     private String password = "";
     private Connection con = null;
     private ResultSet rs = null;
-    private PreparedStatement preparedStatement = null; 
+    private PreparedStatement preparedStatement = null;
 
     public Conexion() {
 
     }
-    
-    public void conectar(){ 
-        
+
+    private boolean conectar() {
+
         try {
             con = DriverManager.getConnection(url, username, password);
-            System.out.println("Probado aqui!!");
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            return false;
         }
     }
 
-    public Connection obtenerConexion() {
-        return con;
-    }
+    private boolean desconectar() {
 
-    public void desconectar() {
         try {
 
             if (con != null) {
                 con.close();
-                System.out.println("Ya nos hemos desconectado!");
             }
-     
+            return true;
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            return false;
         }
     }
-    
-    public void insertarEvento(){
-         
-        String query = "INSERT INTO EVENTOS"
-                + "(NOMBRE,"
-                + " HORA_INICIO,"
-                + " HORA_FINAL,"
-                +  "LUGAR,"
-                +  "FECHA,"
-                +  "DETALLES)"
-                + " VALUES (?, ?, ?, ?, ?, ?)";
-      conectar();
-     
-        try {
-            preparedStatement = con.prepareStatement(query);
-            preparedStatement.setString(1, "Examen Diferencial");
-            preparedStatement.setString(2, "15:00");
-            preparedStatement.setString(3, "18:00");
-            preparedStatement.setString(4, "ITLA");
-            preparedStatement.setString(5, "2020-10-12");
-            preparedStatement.setString(6, "Pasar el examen con 90");
 
-            preparedStatement.executeUpdate();
+    public boolean insertarEvento(Evento evento) {
 
-        } catch (SQLException ex) {
+        boolean insertado = false;
 
-            ex.printStackTrace();
-        } 
-        finally {
-            desconectar();
+        String query = "INSERT INTO EVENTOS" + "(NOMBRE," + " HORA_INICIO," + " HORA_FINAL," + "LUGAR," + "FECHA,"
+                + "DETALLES)" + " VALUES (?, ?, ?, ?, ?, ?)";
+
+        if (conectar()) {
+
+            try {
+                preparedStatement = con.prepareStatement(query);
+                preparedStatement.setString(1, evento.getNombreEvento());
+                preparedStatement.setTime(2, evento.getHoraInicio());
+                preparedStatement.setTime(3, evento.getHoraFinal());
+                preparedStatement.setString(4, evento.getLugar());
+                preparedStatement.setDate(5, evento.getFecha());
+                preparedStatement.setString(6, evento.getDetalles());
+
+                preparedStatement.executeUpdate();
+                insertado = true;
+
+            } catch (SQLException ex) {
+                insertado = false;
+            } finally {
+                desconectar();
+            }
         }
+        return insertado;
     }
-    
-    public void seleccionarEvento(int id){
-        
+
+    public Evento seleccionarEvento(int id) {
+
+        Evento evento = null;
         String query = "SELECT * FROM EVENTOS WHERE ID = " + id;
-        conectar();
-        
-        try {
-            preparedStatement = con.prepareStatement(query);
-            
-            rs = preparedStatement.executeQuery();
-             
-            if (rs.next()){
-                 System.out.println(rs.getInt("ID"));
-                 System.out.println(rs.getString("NOMBRE"));
+
+        if (conectar()) {
+
+            try {
+                preparedStatement = con.prepareStatement(query);
+
+                rs = preparedStatement.executeQuery();
+
+                if (rs.next()) {
+                    evento = new Evento(rs.getInt("id"), rs.getString("Nombre"), rs.getTime("Hora_Inicio"),
+                            rs.getTime("Hora_Final"), rs.getString("Lugar"), rs.getDate("Fecha"),
+                            rs.getString("Detalles"));
+                }
+            } catch (SQLException ex) {
+
+            } finally {
+                desconectar();
             }
-           
         }
-        catch(SQLException ex){
-            ex.printStackTrace();
-        }
-        finally {
-            desconectar();
-        }
+        return evento;
     }
-    
-   public void buscarEventoPorFecha(String fecha){
-        
-        // List<Evento> eventos = new ArrayList<>(); 
-       
+
+    public List<Evento> buscarEventoPorFecha(String fecha) {
+
+        List<Evento> eventos = new ArrayList<>();
         String query = "SELECT * FROM EVENTOS WHERE FECHA = " + "\'" + fecha + "\'";
         conectar();
-        
-        try {
-            preparedStatement = con.prepareStatement(query);
-            
-            rs = preparedStatement.executeQuery();
-             
-            if (rs.next()){
-                 System.out.println(rs.getInt("ID"));
-                 System.out.println(rs.getString("NOMBRE"));
-            }
-           
-        }
-        catch(SQLException ex){
-            ex.printStackTrace();
-        }
-        finally {
-            desconectar();
-        }
-    }
-   
-      public void buscarEventoPorLugar(String lugar){
- 
-         // List<Evento> eventos = new ArrayList<>();
-        
-        String query = "SELECT * FROM EVENTOS WHERE LUGAR = " + "\"" + lugar + "\" ORDER BY FECHA";
-        conectar();
-        
-        try {
-            preparedStatement = con.prepareStatement(query);
-            
-            rs = preparedStatement.executeQuery();
-             
-            if (rs.next()){
-                 System.out.println(rs.getInt("ID"));
-                 System.out.println(rs.getString("NOMBRE"));
-            }
-           
-        }
-        catch(SQLException ex){
-            ex.printStackTrace();
-        }
-        finally {
-            desconectar();
-        }
-    }
-     
-    public void buscarEventoPorDetalle(String expresion){
 
-        // List<Evento> eventos = new ArrayList<>();
-        
-       String query = "SELECT * FROM EVENTOS WHERE DETALLES LIKE " + "\"%" + expresion + "%\" ORDER BY FECHA";
-       conectar();
-       
-         try {
-                   
-            preparedStatement = con.prepareStatement(query);
-           
-            
-            rs = preparedStatement.executeQuery();
-             
-            if (rs.next()){
-                 System.out.println(rs.getInt("ID"));
-                 System.out.println(rs.getString("NOMBRE"));
-            }
-        }
-        catch(SQLException ex){
-            ex.printStackTrace();
-        }
-        finally {
-            desconectar();
-        }      
-    }
-    
-    public void eliminarEvento(int id) {
-    
-         String query = "DELETE FROM EVENTOS WHERE ID = ?" ;
-         conectar();
-         
-         try{
-             preparedStatement = con.prepareStatement(query);
-             preparedStatement.setInt(1, id);
-             
-             preparedStatement.executeUpdate();
-         }
-         catch(SQLException ex){
-             ex.printStackTrace();
-         }
-         finally {
-            desconectar();
-        }
-    }
-    
-    
-    public void getAllEventos(){
-        
-        // List<Evento> eventos = new ArrayList<>();
-        
-        String query = "SELECT * FROM EVENTOS ORDER BY FECHA";
-        conectar();
-        
         try {
             preparedStatement = con.prepareStatement(query);
-            
             rs = preparedStatement.executeQuery();
-             
-            while(rs.next()){
-                 System.out.println(rs.getInt("ID"));
-                 System.out.println(rs.getString("NOMBRE"));
+
+            while (rs.next()) {
+                eventos.add(new Evento(rs.getInt("id"), rs.getString("Nombre"), rs.getTime("Hora_Inicio"),
+                        rs.getTime("Hora_Final"), rs.getString("Lugar"), rs.getDate("Fecha"),
+                        rs.getString("Detalles")));
             }
-           
-        }
-        catch(SQLException ex){
-            ex.printStackTrace();
-        }
-        finally {
-            desconectar();
-        }
-    }
- 
-     public void actualizarEvento(int id){
-         
-        String query = "UPDATE EVENTOS SET NOMBRE = ? ,HORA_INICIO = ? ,HORA_FINAL = ? ,LUGAR = ? ,FECHA = ? ,DETALLES = ? WHERE ID = " + id;   
-
-        conectar();
-     
-        try {
-            preparedStatement = con.prepareStatement(query);
-            preparedStatement.setString(1, "Examen Diferencial Actualizado");
-            preparedStatement.setString(2, "15:00");
-            preparedStatement.setString(3, "18:00");
-            preparedStatement.setString(4, "ITLA");
-            preparedStatement.setString(5, "2020-10-12");
-            preparedStatement.setString(6, "Pasar el examen con 90");
-
-            preparedStatement.executeUpdate();
 
         } catch (SQLException ex) {
 
-            ex.printStackTrace();
         } finally {
             desconectar();
         }
+        return eventos;
     }
-       
-    
-    /*public static void main(String[] args){
-       
-        Conexion co = new Conexion();
-        co.buscarEventoPor("ITLA");
-    }   
 
-*/
+    public List<Evento> buscarEventoPorLugar(String lugar) {
+
+        List<Evento> eventos = new ArrayList<>();
+
+        String query = "SELECT * FROM EVENTOS WHERE LUGAR = " + "\"" + lugar + "\" ORDER BY FECHA";
+
+        if (conectar()) {
+
+            try {
+                preparedStatement = con.prepareStatement(query);
+                rs = preparedStatement.executeQuery();
+
+                while (rs.next()) {
+                    eventos.add(new Evento(rs.getInt("id"), rs.getString("Nombre"), rs.getTime("Hora_Inicio"),
+                            rs.getTime("Hora_Final"), rs.getString("Lugar"), rs.getDate("Fecha"),
+                            rs.getString("Detalles")));
+                }
+
+            } catch (SQLException ex) {
+
+            } finally {
+                desconectar();
+            }
+        }
+        return eventos;
+    }
+
+    public List<Evento> buscarEventoPorDetalle(String expresion) {
+
+        List<Evento> eventos = new ArrayList<>();
+
+        String query = "SELECT * FROM EVENTOS WHERE DETALLES LIKE " + "\"%" + expresion + "%\" ORDER BY FECHA";
+
+        if (conectar()) {
+
+            try {
+
+                preparedStatement = con.prepareStatement(query);
+                rs = preparedStatement.executeQuery();
+
+                while (rs.next()) {
+                    eventos.add(new Evento(rs.getInt("id"), rs.getString("Nombre"), rs.getTime("Hora_Inicio"),
+                            rs.getTime("Hora_Final"), rs.getString("Lugar"), rs.getDate("Fecha"),
+                            rs.getString("Detalles")));
+                }
+            } catch (SQLException ex) {
+
+            } finally {
+                desconectar();
+            }
+        }
+        return eventos;
+    }
+
+    public void eliminarEvento(int id) {
+
+        String query = "DELETE FROM EVENTOS WHERE ID = ?";
+
+        if (conectar()) {
+
+            try {
+                preparedStatement = con.prepareStatement(query);
+                preparedStatement.setInt(1, id);
+
+                preparedStatement.executeUpdate();
+            } catch (SQLException ex) {
+
+            } finally {
+                desconectar();
+            }
+        }
+    }
+
+    public List<Evento> getAllEventos() {
+
+        List<Evento> eventos = new ArrayList<>();
+
+        String query = "SELECT * FROM EVENTOS ORDER BY FECHA";
+
+        if (conectar()) {
+
+            try {
+                preparedStatement = con.prepareStatement(query);
+                rs = preparedStatement.executeQuery();
+
+                while (rs.next()) {
+                    eventos.add(new Evento(rs.getInt("id"), rs.getString("Nombre"), rs.getTime("Hora_Inicio"),
+                            rs.getTime("Hora_Final"), rs.getString("Lugar"), rs.getDate("Fecha"),
+                            rs.getString("Detalles")));
+                }
+            } catch (SQLException ex) {
+
+            } finally {
+                desconectar();
+            }
+        }
+        return eventos;
+    }
+
+    public boolean actualizarEvento(int id, Evento evento) {
+
+        String query = "UPDATE EVENTOS SET NOMBRE = ? ,HORA_INICIO = ? ,HORA_FINAL = ? ,LUGAR = ? ,FECHA = ? ,DETALLES = ? WHERE ID = "
+                + id;
+        boolean actualizado = false;
+
+        if (conectar()) {
+
+            try {
+                preparedStatement = con.prepareStatement(query);
+
+                preparedStatement.setString(1, evento.getNombreEvento());
+                preparedStatement.setTime(2, evento.getHoraInicio());
+                preparedStatement.setTime(3, evento.getHoraFinal());
+                preparedStatement.setString(4, evento.getLugar());
+                preparedStatement.setDate(5, evento.getFecha());
+                preparedStatement.setString(6, evento.getDetalles());
+
+                preparedStatement.executeUpdate();
+
+                actualizado = true;
+
+            } catch (SQLException ex) {
+                actualizado = false;
+            } finally {
+                desconectar();
+            }
+        }
+        return actualizado;
+    }
 }

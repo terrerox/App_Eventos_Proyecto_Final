@@ -23,7 +23,6 @@ SELECT *
 FROM EVENTOS;
 
 
-
 SELECT * 
 FROM eventos
 order by FECHA DESC;
